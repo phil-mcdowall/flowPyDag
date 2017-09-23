@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.above {
+  z-index: 1000000;
+}
+
+#OUTPUT{
+  z-index:9999999;
+  float:left;
+}
+
+
+.code_output{
+  white-space:pre-line;
+}
