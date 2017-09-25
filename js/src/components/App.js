@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import ReactNodeGraph from './graph/'
+import DropdownTest from './new_node'
+
 import toposort from 'toposort'
 // import NodeAddList from './nodeAddList'
-import SyntaxHighlighter from 'react-syntax-highlighter';
 // import { docco } from 'react-syntax-highlighter/dist/styles';
 const FunctionNode = function(nid,type,fields){
         this.nid = nid;
@@ -14,7 +15,7 @@ const FunctionNode = function(nid,type,fields){
         this.input_weights = [0];
         this.name = "var" + nid;
         this.fields = fields ? fields : {
-            in:[{'name':'mu','value':'None'},
+            input:[{'name':'mu','value':'None'},
                 {'name':'sd','value':'None'},
                 {'name':'observed','value':'None'}],
             out:[{'name':'return'}]
@@ -23,6 +24,7 @@ const FunctionNode = function(nid,type,fields){
 
 const LiteralNode = function(nid,fields){
     this.nid = nid;
+    this.type = "_literal"
     this.x = 200;
     this.y = 200;
     this.n_connects = 0;
@@ -30,7 +32,7 @@ const LiteralNode = function(nid,fields){
     this.input_weights = [0];
     this.name = this.nid;
     this.fields = fields ? fields : {
-        in:[{'name':'literal','value':'None'}],
+        input:[{'name':'literal','value':'None'}],
         out:[{'name':'value'}]
     }
 }
@@ -45,10 +47,9 @@ export default class App extends Component {
             code : 'code output'
         };
         console.log(props)
-        init_state.graph.nodes[1] = new FunctionNode(1,'normal')
+        init_state.graph.nodes[1] = new FunctionNode(1,'pymc3.Normal')
         this.node_count = 2;
         this.literals = props.props.literals
-        console.log("1" + this.literals)
         this.literals.forEach(function(elem){init_state.graph.nodes[elem] = new LiteralNode(elem);this.node_count+=1}.bind(this))
         this.state = init_state;
         this.comm = props.props.comm
@@ -74,34 +75,26 @@ export default class App extends Component {
     }
 
     generateArgs(node){
-        return node.fields.in.map(function(e){return e.name+"="+e.value}) + ")"
+        return node.fields.input.map(function(e){return e.name+"="+e.value}) + ")"
     }
     generateCall(node){
         return node.name +" = " +  node.type + "('" + node.name + "'," + this.generateArgs(node)
     }
 
     generateCode(){
-        let order = this.consArray();
         try {
+            let order = this.consArray();
             order = toposort(order);
-            let code = order.map(function(node_id){
-                let node = this.state.graph.nodes[node_id];
-                return ["     "+node.name+" = "+node.type+"("+node.name +"," +
-                node.fields.in.map(function(e){return e.name+"="+e.value})+
-                ") \n"] },this);
-            code = code.join("");
-            let import_line = "import pymc3\nwith pymc3.Model() as model:\n"
-            code = import_line + code
-            this.setState({code:code})
-            this.comm.send({type:'code_compile',body:code})
+            this.comm.send({type:'code_compile',body:{graph:this.state.graph,'order':order}})
         }
-        catch(err){
-            this.setState({code:"Cycle(s) detected in graph!"})
+        catch(err) {
+            console.log("cycles found")
+        }
         }
 
 
 
-    }
+
 
     onNewConnector(fromNode,fromPin,toNode,toPin) {
         let graph = this.state.graph;
@@ -111,11 +104,10 @@ export default class App extends Component {
             to_node : toNode,
             to : toPin
         }];
-        let toPinIdx = this.computePinIndexfromLabel(graph.nodes[toNode].fields.in,toPin)
-        graph.nodes[toNode].fields.in[toPinIdx].value = graph.nodes[fromNode].name;
+        let toPinIdx = this.computePinIndexfromLabel(graph.nodes[toNode].fields.input,toPin)
+        graph.nodes[toNode].fields.input[toPinIdx].value = graph.nodes[fromNode].name;
         graph.connections = connections;
         this.setState({graph: graph});
-        this.generateCode();
     }
 
     onRemoveConnector(connector) {
@@ -127,7 +119,6 @@ export default class App extends Component {
         graph.connections = connections;
         graph.nodes[this.getNodeIdxById(connector.to_node)].level -= 1
         this.setState({graph: graph});
-        this.generateCode();
     }
 
     onNodeMove(nid, pos) {
@@ -149,11 +140,13 @@ export default class App extends Component {
     msg_handler(msg){
         let content = msg.content
         let data = content.data
-        alert(data)
+        let cell=Jupyter.notebook.insert_cell_at_bottom()
+        cell.set_text(data)
     }
 
 
     registerNewNode(node){
+        console.log('registering a node')
         let graph = this.state.graph;
         graph.nodes[this.node_count] = node
         this.node_count += 1;
@@ -161,11 +154,15 @@ export default class App extends Component {
         this.comm.send({type:'test',body:this.node_count})
     }
 
+    createNewNode(event,node_type){
+        let node = new FunctionNode(this.node_count,node_type)
+        this.registerNewNode(node)
+    }
+
     render() {
            return (
-               <div className="container-fluid">
-                   {/*<div className="round-button" onClick={this.createNewNode.bind(this)}> + </div>*/}
-                   <div className="round-button" onClick={this.generateCode.bind(this)}> Compile </div>
+               <div>
+                   <DropdownTest new_node={this.createNewNode.bind(this)} generate = {this.generateCode.bind(this)}/>
             <ReactNodeGraph
                 data={this.state.graph}
                 onNodeMove={(nid, pos)=>this.onNodeMove(nid, pos)}

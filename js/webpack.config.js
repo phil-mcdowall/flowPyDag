@@ -19,17 +19,25 @@ module.exports = [
           path: '/home/phil/PycharmProjects/flowpyBackend/flowpy/static',
           libraryTarget: 'umd'
       },
+        resolve: {
+    extensions: ['', '.jsx', '.scss', '.js', '.json'],
+    modulesDirectories: [
+      'node_modules',
+      path.resolve(__dirname, './node_modules')
+    ]
+  },
       module : {
         loaders : [
+                {
+        test: /\.svg$/,
+        loader: 'svg-inline-loader'
+    },
           {
-            test: /\.js?$/,
+            test: /(\.js|\.jsx)$/,
             exclude: /(node_modules|bower_components)/,
             loaders: [`babel?${JSON.stringify( babelSettings )}`]
           },
-            {
-              test: /\.css$/, loader: "style-loader!css-loader"
-            },
-          { test: /\.css$/, loader: "style-loader?sourceMap!css-loader?importLoaders=1" },
+             { test: /\.css$/, loader: "style-loader!css-loader" },
           {
             test: /\.json$/, loader: 'json-loader'
           }

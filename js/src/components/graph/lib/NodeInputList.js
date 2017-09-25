@@ -10,7 +10,7 @@ export default class NodeInputList extends React.Component {
 	
 	render() {
 		let i = 0;
-
+		console.log("node inputs:", + this.props.items)
 		return (
 			<div className="nodeInputWrapper">
 				<ul className="nodeInputList">

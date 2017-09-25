@@ -2,9 +2,16 @@ import React, {PropTypes} from 'react';
 import onClickOutside from 'react-onclickoutside';
 import NodeInputList from './NodeInputList';
 import NodeOuputList from './NodeOutputList';
-
+import TextField from 'material-ui/TextField';
 var Draggable = require('react-draggable');
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+
+const muiTheme = getMuiTheme({
+
+});
 
 class Node extends React.Component {
   constructor(props) {
@@ -73,7 +80,19 @@ class Node extends React.Component {
         >
         <section className={nodeClass} style={{zIndex:10000}}>
             <header className="node-header" style={{backgroundColor:this.props.color}}>
-              <span className="node-title">{this.props.title} : {this.props.nid}</span>
+              <span className="node-title">
+                <MuiThemeProvider muiTheme={muiTheme}>
+                <TextField
+      id="text-field-default"
+      defaultValue={this.props.title}
+      className={"nameinput"}
+            style={{height:'100%',color:'white','font-size':'inherit'}}
+
+      inputStyle={{height:'100%',color:'white','font-size':'inherit'}}
+      fullWidth = {true}
+    />
+                </MuiThemeProvider>
+                   : {this.props.nid}</span>
             </header>
             <div className="node-content">
               <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} />

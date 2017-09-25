@@ -84,7 +84,7 @@ export default class index extends React.Component {
 			let fromNode = nodes[this.state.source[0]];
 			let fromPinName = fromNode.fields.out[this.state.source[1]].name;
 			let toNode = nodes[nid];
-			let toPinName = toNode.fields.in[inputIndex].name;
+			let toPinName = toNode.fields.input[inputIndex].name;
 
 			this.props.onNewConnector(fromNode.nid, fromPinName, toNode.nid, toPinName);
 		}
@@ -165,7 +165,7 @@ export default class index extends React.Component {
     								nid={node.nid}
     								color="#000000"
     								title={node.type}
-    								inputs={node.fields.in}
+    								inputs={node.fields.input}
     								outputs={node.fields.out}
     								pos={{x : node.x, y: node.y}}
     								key={node.nid} 
@@ -191,7 +191,7 @@ export default class index extends React.Component {
 						let toNode = nodes[connector.to_node];
 
 						let splinestart = computeOutOffsetByIndex(fromNode.x, fromNode.y, this.computePinIndexfromLabel(fromNode.fields.out, connector.from));
-						let splineend = computeInOffsetByIndex(toNode.x, toNode.y, this.computePinIndexfromLabel(toNode.fields.in, connector.to));
+						let splineend = computeInOffsetByIndex(toNode.x, toNode.y, this.computePinIndexfromLabel(toNode.fields.input, connector.to));
 
 						return <Spline 
 							start={splinestart}
