@@ -163,14 +163,15 @@ export default class index extends React.Component {
 					return <Node 
     								index={i++} 
     								nid={node.nid}
-    								color="#000000"
+    								color={node.color}
     								title={node.type}
+									name={node.name}
     								inputs={node.fields.input}
     								outputs={node.fields.out}
     								pos={{x : node.x, y: node.y}}
     								key={node.nid} 
-									level={node.level}
-   								onNodeStart={(nid)=>this.handleNodeStart(nid)}
+									data={node.data}
+   									onNodeStart={(nid)=>this.handleNodeStart(nid)}
     								onNodeStop={(nid, pos)=>this.handleNodeStop(nid, pos)}
     								onNodeMove={(index,pos)=>this.handleNodeMove(index,pos)}
     								

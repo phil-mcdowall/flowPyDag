@@ -3,6 +3,7 @@ import onClickOutside from 'react-onclickoutside';
 import NodeInputList from './NodeInputList';
 import NodeOuputList from './NodeOutputList';
 import TextField from 'material-ui/TextField';
+import { Sparklines,SparklinesBars,SparklinesLine,SparklinesReferenceLine } from 'react-sparklines';
 var Draggable = require('react-draggable');
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
@@ -16,9 +17,9 @@ const muiTheme = getMuiTheme({
 class Node extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      selected: false
-    }
+    // this.state = {
+    //   selected: false
+    // }
   }
 
   handleDragStart(event, ui) {
@@ -33,9 +34,9 @@ class Node extends React.Component {
     this.props.onNodeMove(this.props.nid, ui.position);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.selected !== nextState.selected;
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return this.state.selected !== nextState.selected;
+  // }
 
   onStartConnector(index) {
     this.props.onStartConnector(this.props.nid, index);
@@ -50,24 +51,28 @@ class Node extends React.Component {
   }
 
   handleClick(e) {
-    this.setState({selected: true});
+    // this.setState({selected: true});
     if (this.props.onNodeSelect) {
       this.props.onNodeSelect(this.props.nid);
     }
   }
 
   handleClickOutside() {
-    let {selected} = this.state;
+    // let {selected} = this.state;
     if (this.props.onNodeDeselect && selected) {
       this.props.onNodeDeselect(this.props.nid);
     }
-    this.setState({selected: false});
+    // this.setState({selected: false});
+  }
+
+  disable_keybindings(){
+    Jupyter.keyboard_manager.disable()
   }
 
 	render() {
-    let {selected} = this.state;
+    // let {selected} = this.state;
 
-    let nodeClass = 'node' + (selected ? ' selected' : '');
+    let nodeClass = 'node' //+ (selected ? ' selected' : '');
 
 		return (
 		  <div onDoubleClick={(e) => {this.handleClick(e)}}>
@@ -80,22 +85,32 @@ class Node extends React.Component {
         >
         <section className={nodeClass} style={{zIndex:10000}}>
             <header className="node-header" style={{backgroundColor:this.props.color}}>
+              <MuiThemeProvider muiTheme={muiTheme}>
               <span className="node-title">
-                <MuiThemeProvider muiTheme={muiTheme}>
+{this.props.title} :
                 <TextField
       id="text-field-default"
-      defaultValue={this.props.title}
-      className={"nameinput"}
-            style={{height:'100%',color:'white','font-size':'inherit'}}
-
+      onFocus={this.disable_keybindings}
+      defaultValue={this.props.name}
+            style={{width:'50%',height:'100%',color:'white','font-size':'inherit'}}
+            underlineStyle={{display: 'none'}}
       inputStyle={{height:'100%',color:'white','font-size':'inherit'}}
-      fullWidth = {true}
     />
-                </MuiThemeProvider>
-                   : {this.props.nid}</span>
+
+                   </span>
+              </MuiThemeProvider>
             </header>
             <div className="node-content">
               <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} />
+
+              {/*<Sparklines data={this.props.data} svgHeight={20}>*/}
+                  {/*<SparklinesBars style={{ stroke: "white", fill: "#41c3f9", fillOpacity: ".25" }} />*/}
+              {/*</Sparklines>*/}
+<Sparklines data={this.props.data} style={{background: "rgb(145, 195, 200)"}} svgHeight={40}>
+    <SparklinesLine style={{ stroke: "#2f2828", fill: "none" }} />
+    <SparklinesReferenceLine
+        style={{ stroke: '#2f2828', strokeOpacity: .75, strokeDasharray: '2, 2' }} />
+</Sparklines>
               <NodeOuputList items={this.props.outputs} onStartConnector={(index)=>this.onStartConnector(index)} />
             </div>
         </section>

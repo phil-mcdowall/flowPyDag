@@ -1,27 +1,45 @@
-# Jupyter-React-Example
-Install webpack
-npm install
+# FlowPyDag
 
-A completely working example of how to leverage any react component inside a Jupyter NbExtension using [Jupyter-React](https://github.com/timbr-io/jupyter-react) and [Jupyter-React-JS](https://github.com/timbr-io/jupyter-react-js).
+Dataflow style GUI for defining probabilistic models in PyMC3.
+
+v0.01 In Development
 
 ## Installing 
-
+requires jupyter, npm & webpack
 ```
-git clone git@github.com:timbr-io/jupyter-react-example.git 
-cd jupyter-react-example && python setup.py develop
-jupyter notebook 
+cd js; webpack; cd ..;sudo python setup.py develop;jupyter notebook
 ```
 
 ## Usage 
+pre-alpha code in development!
+
+![linear regression](docs/Screenshot-2017-10-23 flowpy.png)
+
 
 Inside a Jupyter Notebook
+
 ```python
-from example import Thing
+from flowpy import Dag
 from IPython.display import display
-import random
+data = 1,2,2,3,3,3,4,4,5,-10,10,-100,100
 
-data = [[{'y': random.randrange(1,10), "x": i+1} for i, v in enumerate(range(10))] for x in [1,2,3,4]]
-
-mything = Thing(props={"data":data})
-display(mything)
+dag = Dag(data={'data':data})
+display(dag)
 ```
+Design a graph using the GUI, then hit 'compile code'. Compiling checks the graph for errors and draws quick
+ approximate samples for the posteriors.
+
+## #TODO
+- Docs & Tests!
+- Frontend ability to delete nodes
+- Frontend ability to rename variables
+- Required arguments
+- Deterministic nodes!
+- Add ability to save graphs
+- Automate distribution extraction from PyMC3 to js frontend
+- Sensible interface to Dag for use in later cells
+- Axis labels on posterior histograms
+- Pandas df as data node
+- Identify node from Exceptions and pass to frontend
+- pre-webpack everything & add setup script
+

@@ -118,7 +118,6 @@ export default class App extends Component {
             return connection != connector
         })
         graph.connections = connections;
-        graph.nodes[this.getNodeIdxById(connector.to_node)].level -= 1
         this.setState({graph: graph});
         this.generateCode();
     }

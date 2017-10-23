@@ -26,6 +26,8 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
+    "react-notifications":"latest",
+    "react-sparklines":"latest",
     "react-tap-event-plugin":"latest",
     "material-ui":"latest",
     "toposort": "",
