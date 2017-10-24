@@ -9,9 +9,10 @@ const FunctionNode = function(nid,params={callable,fields,module,x,y}){
         this.nid = nid;
 
         //related python callable
-        this.type = params.callable ? params.callable : '';
-        this.module = params.module ? params.module :'pymc3';
-
+        this.type = params.type ? params.type : '';
+        this.module = params.module ? params.module :'';
+        this.callable = params.callable;
+        this.alias = params.alias ? params.alias : '';
         //position on graph
         this.x = params.x ? params.x :200;
         this.y = params.y ? params.y : 200;
@@ -32,6 +33,8 @@ const FunctionNode = function(nid,params={callable,fields,module,x,y}){
 
 const node_mapping = {
     'normal': function () {
+        this.module = 'pymc3';
+        this.type = 'distribution';
         this.callable = 'Normal';
         this.fields = {input:[{'name': 'mu', 'value': 'None'}, {'name': 'sd', 'value': 'None'}, {
             'name': 'observed',
@@ -40,6 +43,8 @@ const node_mapping = {
         out:[{'name': 'return'}]}
     },
     'binomial': function () {
+        this.module = 'pymc3';
+        this.type = 'distribution';
         this.callable = 'Binomial';
         this.fields = {input:[{'name': 'n', 'value': 'None'}, {'name': 'p', 'value': 'None'}, {
             'name': 'observed',
@@ -48,6 +53,8 @@ const node_mapping = {
         out:[{'name': 'return'}]}
     },
     'uniform': function () {
+        this.module = 'pymc3';
+        this.type = 'distribution';
         this.callable = 'Uniform';
         this.fields = {input:[{'name': 'lower', 'value': 'None'}, {'name': 'upper', 'value': 'None'}, {
             'name': 'observed',
@@ -56,6 +63,8 @@ const node_mapping = {
         out:[{'name': 'return'}]}
     },
     'gamma': function () {
+        this.module = 'pymc3';
+        this.type = 'distribution';
         this.callable = 'Uniform';
         this.input = [{'name': 'alpha', 'value': 'None'}, {'name': 'beta', 'value': 'None'}, {
             'name': 'observed',
@@ -64,13 +73,37 @@ const node_mapping = {
         this.out = [{'name': 'return'}]
     },
     'product': function () {
-        this.callable = 'math.dot';
+        this.module = '';
+        this.type = 'expression';
+        this.callable = '*';
+        this.alias = 'Product';
         this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
         out:[{'name': 'return'}]};
         this.color = "rgb(94, 159, 173)"
     },
     'sum': function () {
-        this.callable = 'math.sum';
+        this.module = '';
+        this.type = 'expression';
+        this.callable = '+';
+        this.alias = 'Sum';
+        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
+        out:[{'name': 'return'}]};
+        this.color = "rgb(94, 159, 173)"
+    },
+    'subtract': function () {
+        this.module = '';
+        this.type = 'expression';
+        this.callable = '-';
+        this.alias = 'Subtract';
+        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
+        out:[{'name': 'return'}]};
+        this.color = "rgb(94, 159, 173)"
+    },
+    'quotient': function () {
+        this.module = '';
+        this.type = 'expression';
+        this.callable = '/';
+        this.alias = 'Quotient';
         this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
         out:[{'name': 'return'}]};
         this.color = "rgb(94, 159, 173)"
@@ -117,7 +150,6 @@ export default class App extends Component {
     }
 
 
-
     computePinIndexfromLabel(pins, pinLabel) {
         let reval = 0;
 
@@ -143,6 +175,8 @@ export default class App extends Component {
             this.comm.send({type:'CodeCompile',body:{graph:this.state.graph,'order':order}})
             this.createNotification('graph compiling...')        }
         catch(err) {
+            this.createNotification('Error in graph compile')
+            this.createNotification(err)
             console.log("cycles found")
         }
         }
@@ -153,7 +187,6 @@ export default class App extends Component {
         this.setState({graph: graph});
     }
     storeConnection(connection){
-        console.log(connection)
         let fromNode = connection.from_node;
         let fromPin = connection.from;
         let toNode = connection.to_node;
@@ -164,14 +197,10 @@ export default class App extends Component {
         let connections = [...graph.connections,connection];
         let toPinIdx = this.computePinIndexfromLabel(graph.nodes[toNode].fields.input,toPin)
         graph.nodes[toNode].fields.input[toPinIdx].value = graph.nodes[fromNode].name;
-        console.log(graph)
         graph.connections = connections;
         this.setState({graph: graph});
     }
 
-    registerConnection(connection){
-        this.comm.send({type:'NewConnection',body:connection})
-    }
 
     onNewConnector(fromNode,fromPin,toNode,toPin) {
 
@@ -181,7 +210,6 @@ export default class App extends Component {
                         to : toPin};
 
         this.storeConnection(connection);
-        this.registerConnection(connection);
 
     }
 
@@ -229,22 +257,18 @@ export default class App extends Component {
         let msg = message.content.data;
         if(msg.type == "ERROR"){this.createNotification(msg.body)}
         if(msg.type == "POSTERIOR"){this.updateNodes(msg.body)}
+        if(msg.type == "LOAD_GRAPH"){this.load_graph(msg.body)}
     }
 
-
-    registerNewNode(node){
-        this.comm.send({type:'NewNode',body:node})
-    }
+    load_graph(graph){this.setState({graph:{nodes:{},connections:[]}});this.setState({graph: graph})}
 
     createNewNode(event,node_type){
-        console.log(node_mapping[node_type])
         let node = new FunctionNode(this.node_count,new node_mapping[node_type])
         let graph = this.state.graph;
         graph.nodes[this.node_count] = node;
         this.node_count += 1;
 
         this.setState({'graph':graph});
-        this.registerNewNode(node)
     }
 
     kernelSample(){

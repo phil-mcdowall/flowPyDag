@@ -2,6 +2,8 @@ from jupyter_react import Component
 import random
 import numpy as np
 from collections import OrderedDict
+import json
+
 
 class Dag(Component):
     module = 'Dag'
@@ -14,6 +16,8 @@ class Dag(Component):
         exec("import pymc3", self.evalscope)
 
         self.code = None
+
+        self.graph = None
 
         if data is not None:
             if type(data) is not dict:
@@ -46,8 +50,8 @@ class Dag(Component):
             """
             run approximate advi then short samples to update node distributions
             """
-            graph = message['body']
-            self.compile_graph(graph)
+            self.graph = message['body']['graph']
+            self.compile_graph(message['body'])
             self.evaluate()
             posteriors = self._get_posteriors()
             self.update_posteriors_msg(posteriors)
@@ -70,6 +74,23 @@ class Dag(Component):
             except KeyError:
                 pass
         return msg_body
+
+    def send_load_graph_message(self,graph):
+        msg_type = "LOAD_GRAPH"
+        self.send({'type': msg_type, 'body': graph})
+
+    def save_graph(self,path):
+        if self.graph:
+            with open(path, 'w') as outfile:
+                json.dump(self.graph, outfile)
+        else:
+            raise ValueError("Compiled graph not found")
+
+    def load_graph(self,path):
+        with open(path, 'r') as infile:
+            graph = json.load(infile)
+            print(graph)
+        self.send_load_graph_message(graph)
 
     def __str__(self):
         return self.code
@@ -101,22 +122,22 @@ class CodeGenerator:
         if node['type'] == 'Data':
             return ''
 
-        # Collect record of nodes in model
+        # Collect non-data nodes contained in model
         self.evaled_nodes[node['nid']] = node['name']
 
-        args = ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
-
-        if node['type'] == 'math.dot':
-            return "    {name} = pymc3.{type}({args})\n".format(args=args,**node)
-
-        if node['type'] == 'math.sum':
-            expression = '+'.join(["{value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
+        if node['type'] == 'expression':
+            expression = '{}'.format(node['callable']).join(["{value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
             return "    {name} = {expression} \n".format(expression=expression,**node)
 
-        if assign:
-            return "    {name} = pymc3.{type}('{name}',{args})\n".format(args=args,**node)
-        else:
-            return "pymc3.{type}('{name}',{args})".format(args=args, **node)
+        # pymc3 nodes take an awkward first positional argument which is a string name for the node
+        if node['type'] == 'distribution':
+            args = ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
+            return "    {name} = pymc3.{callable}('{name}',{args})\n".format(args=args,**node)
+
+        # pymc3 nodes take an awkward first positional argument which is a string name for the node
+        if node['type'] == 'function':
+            args = ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
+            return "    {name} = pymc3.{callable}('{name}',{args})\n".format(args=args,**node)
 
 
 

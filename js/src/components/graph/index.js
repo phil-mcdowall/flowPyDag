@@ -164,7 +164,7 @@ export default class index extends React.Component {
     								index={i++} 
     								nid={node.nid}
     								color={node.color}
-    								title={node.type}
+    								title={node.alias ? node.alias : node.callable}
 									name={node.name}
     								inputs={node.fields.input}
     								outputs={node.fields.out}
