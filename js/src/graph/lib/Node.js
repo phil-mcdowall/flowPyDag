@@ -58,7 +58,7 @@ class Node extends React.Component {
   }
 
 	render() {
-    let {selected} = this.state;
+    // let {selected} = this.state;
 
     let nodeClass = 'node' + (selected ? ' selected' : '');
 

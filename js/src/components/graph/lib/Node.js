@@ -6,13 +6,49 @@ import TextField from 'material-ui/TextField';
 import { Sparklines,SparklinesBars,SparklinesLine,SparklinesReferenceLine } from 'react-sparklines';
 var Draggable = require('react-draggable');
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 
 const muiTheme = getMuiTheme({
 
 });
+
+class AxisLabels extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        if(this.props.data.min) {
+            return (
+                <div className="axisLimits" style={{
+                    width: '100%',
+                    color: 'white',
+                    fontSize: 'x-small',
+                    marginTop: '-10px'
+                }}>
+                    <div style={{
+                        width: '33%',
+                        display: 'inline-block'
+                    }}>{this.props.data.min ? this.props.data.min.toPrecision(3) : []}</div>
+                    <div style={{width: '33%', display: 'inline-block', 'textAlign': 'center'}}>
+                        mu:{this.props.data.mean ? this.props.data.mean.toPrecision(3) : []}</div>
+                    <div style={{
+                        width: '33%',
+                        display: 'inline-block',
+                        'textAlign': 'right'
+                    }}>{this.props.data.max ? this.props.data.max.toPrecision(3) : []}</div>
+                </div>
+            )
+        }
+        else{
+            return <span/>
+        }
+    }
+}
+
 
 class Node extends React.Component {
   constructor(props) {
@@ -21,6 +57,7 @@ class Node extends React.Component {
     //   selected: false
     // }
   }
+
 
   handleDragStart(event, ui) {
     this.props.onNodeStart(this.props.nid, ui);
@@ -73,7 +110,6 @@ class Node extends React.Component {
     // let {selected} = this.state;
 
     let nodeClass = 'node' //+ (selected ? ' selected' : '');
-
 		return (
 		  <div onDoubleClick={(e) => {this.handleClick(e)}}>
         <Draggable
@@ -102,16 +138,14 @@ class Node extends React.Component {
             </header>
             <div className="node-content">
               <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} />
-
-              {/*<Sparklines data={this.props.data} svgHeight={20}>*/}
-                  {/*<SparklinesBars style={{ stroke: "white", fill: "#41c3f9", fillOpacity: ".25" }} />*/}
-              {/*</Sparklines>*/}
-<Sparklines data={this.props.data} style={{background: "rgb(145, 195, 200)"}} svgHeight={40}>
-    <SparklinesLine style={{ stroke: "#2f2828", fill: "none" }} />
-    <SparklinesReferenceLine
-        style={{ stroke: '#2f2828', strokeOpacity: .75, strokeDasharray: '2, 2' }} />
-</Sparklines>
               <NodeOuputList items={this.props.outputs} onStartConnector={(index)=>this.onStartConnector(index)} />
+
+            <Sparklines data={this.props.data ? this.props.data.freq : []} style={{background: "rgb(145, 195, 200)"}} svgHeight={40}>
+                <SparklinesLine style={{ stroke: "#2f2828", fill: "none" }} />
+
+            </Sparklines>
+                <AxisLabels data={this.props.data}/>
+
             </div>
         </section>
         </Draggable>

@@ -64,7 +64,6 @@ export default class index extends React.Component {
 	}
 
 	handleNodeMove(index, pos) {
-		console.log("pos = " + pos)
 		let d = this.state.data;
 		d.nodes[index].x = pos.left;
 		d.nodes[index].y = pos.top;

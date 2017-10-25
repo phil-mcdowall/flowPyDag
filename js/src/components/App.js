@@ -27,7 +27,7 @@ const FunctionNode = function(nid,params={callable,fields,module,x,y}){
             out:[{'name':'return'}]
         }
 
-        this.data = []
+        this.data = {'freq':[],'bins':[]}
     this.color = params.color ? params.color : 'black'
 };
 
@@ -126,6 +126,8 @@ const LiteralNode = function(nid,fields,x,y){
         out:[{'name':'value'}]
     }
     this.color = "#032b33"
+    this.data = {'freq':[],'bins':[]}
+
 };
 
 export default class App extends Component {
@@ -213,9 +215,7 @@ export default class App extends Component {
 
     }
 
-    deregisterConnection(connection){
-        this.comm.send({type:'DelConnection',body:connection})
-    }
+
 
     onRemoveConnector(connector) {
         let graph = this.state.graph;
@@ -223,9 +223,12 @@ export default class App extends Component {
         connections = connections.filter((connection) => {
             return connection != connector
         });
+        console.log(connector);
+        let to_node = graph.nodes[connector.to_node]
+        let pinIdx = this.computePinIndexfromLabel(to_node.fields.input, connector.to)
+        to_node.fields.input[pinIdx].value = 'None'
         graph.connections = connections;
         this.setState({graph: graph});
-        this.deregisterConnection(connector)
     }
 
     onNodeMove(nid, pos) {
@@ -253,14 +256,19 @@ export default class App extends Component {
 
     // Handle messages from the kernel
     msg_handler(message){
-        console.log(message)
         let msg = message.content.data;
         if(msg.type == "ERROR"){this.createNotification(msg.body)}
         if(msg.type == "POSTERIOR"){this.updateNodes(msg.body)}
         if(msg.type == "LOAD_GRAPH"){this.load_graph(msg.body)}
     }
 
-    load_graph(graph){this.setState({graph:{nodes:{},connections:[]}});this.setState({graph: graph})}
+    load_graph(graph){
+        this.setState({graph:{nodes:{},connections:[]}});
+        this.setState({graph: graph});
+        this.node_count = 1
+        for(let node in graph.nodes){this.node_count += 1}
+    };
+
 
     createNewNode(event,node_type){
         let node = new FunctionNode(this.node_count,new node_mapping[node_type])

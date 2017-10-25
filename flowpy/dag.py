@@ -18,6 +18,7 @@ class Dag(Component):
         self.code = None
 
         self.graph = None
+        self.graph_nodes = None
 
         if data is not None:
             if type(data) is not dict:
@@ -32,9 +33,18 @@ class Dag(Component):
         self.on_msg(self._handle_msg)
         self.nodes = {}
 
-    def compile_graph(self,graph):
-        self.code = self.code_generator.generate_code(graph)
-        self.evaled_nodes = self.code_generator.evaled_nodes
+        self.node_mapping = {'expression': ExpressionNode,
+                             'distribution': DistributionNode,
+                             'function': Node,
+                             'data': DataNode}
+
+    def parse_graph_message(self, graph):
+        self.graph = graph['graph']
+        self.graph_nodes =[graph['graph']['nodes'][str(node_id)] for node_id in graph['order']]
+        self.nodes = [self.node_mapping.get(node['type'],NullNode)(node) for node in self.graph_nodes]
+
+    def compile_graph(self):
+        self.code = self.code_generator.generate_code(self.nodes)
 
     def evaluate(self):
         try:
@@ -50,8 +60,8 @@ class Dag(Component):
             """
             run approximate advi then short samples to update node distributions
             """
-            self.graph = message['body']['graph']
-            self.compile_graph(message['body'])
+            self.parse_graph_message(message['body'])
+            self.compile_graph()
             self.evaluate()
             posteriors = self._get_posteriors()
             self.update_posteriors_msg(posteriors)
@@ -68,9 +78,17 @@ class Dag(Component):
 
     def _get_posteriors(self):
         msg_body = {}
-        for node_id, node_name in self.evaled_nodes.items():
+
+        for node in self.nodes:
+            node_id, node_name = node.node.get('nid'), node.node.get('name')
             try:
-                msg_body[node_id] = list(np.histogram(self.evalscope['samples'][node_name])[0])
+                samples = self.evalscope['samples'][node_name]
+                histogram = np.histogram(samples)
+                msg_body[node_id] = {'freq':list(histogram[0]),
+                                     'min':np.min(histogram[1]),
+                                     'max':np.max(histogram[1]),
+                                     'mean':np.mean(samples),
+                                     'median':np.median(samples)}
             except KeyError:
                 pass
         return msg_body
@@ -89,7 +107,6 @@ class Dag(Component):
     def load_graph(self,path):
         with open(path, 'r') as infile:
             graph = json.load(infile)
-            print(graph)
         self.send_load_graph_message(graph)
 
     def __str__(self):
@@ -98,46 +115,52 @@ class Dag(Component):
 
 class CodeGenerator:
     def __init__(self):
-        self.evalscope = {}
-        self.evaled_nodes = OrderedDict()
+        self.graph = None
+        self.nodes = None
 
-    def generate_code(self,_graph):
-        # print("eval scope = ",self.evalscope)
-        graph = _graph['graph']
-        order = _graph['order']
-        #TODO number of samples as a user input
-        n_samples = 10000
+    def generate_code(self,nodes):
+        n_samples = 1000
         context_manager = "with pymc3.Model() as model:\n"
         inference = "\n    approx = pymc3.fit(n=30000, method=pymc3.ADVI(), model=model)" \
                     "\n    samples = approx.sample({nsamples})".format(nsamples=n_samples)
         try:
-            code = "".join([self._parse_node(graph['nodes'][str(node_id)]) for node_id in order])
+            code = "".join(str(node) for node in nodes)
         except:
-            raise ValueError(graph['nodes'])
+            raise ValueError(nodes)
         return context_manager + code + inference
 
-    def _parse_node(self,node,assign=True):
 
-        # Data nodes are loaded to evalscope on initialisation
-        if node['type'] == 'Data':
-            return ''
+class Node:
+    def __init__(self,node):
+        self.node = node
+        self.args = self.str_args(node)
+        self.return_template = "    {name} = {callable}('{name}',{args})\n"
 
-        # Collect non-data nodes contained in model
-        self.evaled_nodes[node['nid']] = node['name']
+    def str_args(self,node):
+        return ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
 
-        if node['type'] == 'expression':
-            expression = '{}'.format(node['callable']).join(["{value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
-            return "    {name} = {expression} \n".format(expression=expression,**node)
-
-        # pymc3 nodes take an awkward first positional argument which is a string name for the node
-        if node['type'] == 'distribution':
-            args = ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
-            return "    {name} = pymc3.{callable}('{name}',{args})\n".format(args=args,**node)
-
-        # pymc3 nodes take an awkward first positional argument which is a string name for the node
-        if node['type'] == 'function':
-            args = ','.join(["{name} = {value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
-            return "    {name} = pymc3.{callable}('{name}',{args})\n".format(args=args,**node)
+    def __str__(self):
+        return self.return_template.format(args=self.args, **self.node)
 
 
+class ExpressionNode(Node):
+    def __init__(self,node):
+        super(ExpressionNode,self).__init__(node)
+        self.return_template = "    {name} = {args} \n"
 
+    def str_args(self,node):
+        return node['callable'].join(["{value}".format(**x) for x in node['fields']['input'] if x['value'] != 'None'])
+
+
+class DistributionNode(Node):
+    def __init__(self, node):
+        super(DistributionNode, self).__init__(node)
+        self.return_template = "    {name} = pymc3.{callable}('{name}',{args})\n"
+
+class DataNode(Node):
+    def __str__(self):
+        return ''
+
+class NullNode(Node):
+    def __str__(self):
+        return ''

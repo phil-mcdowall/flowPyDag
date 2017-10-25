@@ -26,6 +26,7 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
+    "recharts":"latest",
     "react-notifications":"latest",
     "react-sparklines":"latest",
     "react-tap-event-plugin":"latest",
