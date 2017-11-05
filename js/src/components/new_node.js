@@ -14,6 +14,7 @@ import Subheader from 'material-ui/Subheader';
 import AppBar from 'material-ui/AppBar';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import Sync from 'material-ui/svg-icons/notification/sync';
+import Avatar from 'material-ui/Avatar';
 var injectTapEventPlugin = require("react-tap-event-plugin");
 injectTapEventPlugin();
 
@@ -24,8 +25,8 @@ const muiTheme = getMuiTheme({
 export default class MenuBar extends React.Component {
    constructor(props) {
         super(props);
-       this.new_node = props.new_node
-
+       this.new_node = props.new_node;
+        this.node_types = props.node_types;
     }
 
   newNode(event){
@@ -48,6 +49,21 @@ export default class MenuBar extends React.Component {
                 maxHeight={400}
                 >
                   <Subheader>Distributions</Subheader>
+                  {Object.keys(this.node_types).map((key) => {
+						return (
+
+                            <MenuItem value={key} primaryText={key}  rightAvatar={
+        <Avatar
+            color={'grey'}
+            backgroundColor={'white'}
+          size={30}
+        >
+            {this.node_types[key].module.split(".")[2]}
+        </Avatar>
+      }>    </MenuItem>
+						)
+
+					})}
           <MenuItem value={'normal'} primaryText="Normal" />
           <MenuItem value={'uniform'} primaryText="Uniform" />
           <MenuItem value={'binomial'} primaryText="Binomial" />

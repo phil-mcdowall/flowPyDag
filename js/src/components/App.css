@@ -140,7 +140,15 @@ body {
     list-style: none;
     padding: 0;
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.required {
+    color: indianred;
+}
+
+.required.hasvalue{
+    color: forestgreen;
 }
 
 .nodeOutputList li {

@@ -67,34 +67,8 @@ export default class App extends Component {
         }
     }
 
-    generateArgs(node){
-        return node.fields.in.map(function(e){return e.name+"="+e.value}) + ")"
-    }
-    generateCall(node){
-        return node.name +" = " +  node.type + "('" + node.name + "'," + this.generateArgs(node)
-    }
-
-    generateCode(){
-        let order = this.consArray();
-        try {
-            order = toposort(order);
-            let code = order.map(function(node_id){
-                let node = this.state.graph.nodes[node_id];
-                return ["     "+node.name+" = "+node.type+"("+node.name +"," +
-                node.fields.in.map(function(e){return e.name+"="+e.value})+
-                ") \n"] },this);
-            code = code.join("");
-            let import_line = "import pymc3\nwith pymc3.Model() as model:\n"
-            code = import_line + code
-            this.setState({code:code})
-        }
-        catch(err){
-            this.setState({code:"Cycle(s) detected in graph!"})
-        }
 
 
-
-    }
 
     onNewConnector(fromNode,fromPin,toNode,toPin) {
         let graph = this.state.graph;
@@ -108,7 +82,6 @@ export default class App extends Component {
         graph.nodes[toNode].fields.in[toPinIdx].value = graph.nodes[fromNode].name;
         graph.connections = connections;
         this.setState({graph: graph});
-        this.generateCode();
     }
 
     onRemoveConnector(connector) {
@@ -119,7 +92,6 @@ export default class App extends Component {
         })
         graph.connections = connections;
         this.setState({graph: graph});
-        this.generateCode();
     }
 
     onNodeMove(nid, pos) {

@@ -83,6 +83,11 @@ class Node extends React.Component {
     this.props.onCompleteConnector(this.props.nid, index);
   }
 
+  updateValue(index,data){
+      console.log("from 3rd level, pinIdx = " + index)
+      this.props.updateValue(this.props.nid,index,data)
+  }
+
   onChangeName(nid){
 
   }
@@ -128,7 +133,7 @@ class Node extends React.Component {
       id="text-field-default"
       onFocus={this.disable_keybindings}
       defaultValue={this.props.name}
-            style={{width:'50%',height:'100%',color:'white','font-size':'inherit'}}
+            style={{width:'35%',height:'100%',color:'white','font-size':'inherit'}}
             underlineStyle={{display: 'none'}}
       inputStyle={{height:'100%',color:'white','font-size':'inherit'}}
     />
@@ -137,7 +142,7 @@ class Node extends React.Component {
               </MuiThemeProvider>
             </header>
             <div className="node-content">
-              <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} />
+              <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} updateValue={this.updateValue.bind(this)}/>
               <NodeOuputList items={this.props.outputs} onStartConnector={(index)=>this.onStartConnector(index)} />
 
             <Sparklines data={this.props.data ? this.props.data.freq : []} style={{background: "rgb(145, 195, 200)"}} svgHeight={40}>

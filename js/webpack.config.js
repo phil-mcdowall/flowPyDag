@@ -20,7 +20,7 @@ module.exports = [
           libraryTarget: 'umd'
       },
         resolve: {
-    extensions: ['', '.jsx', '.scss', '.js', '.json'],
+    extensions: ['', '.jsx', '.scss', '.js', '.json','.eot'],
     modulesDirectories: [
       'node_modules',
       path.resolve(__dirname, './node_modules')
@@ -31,7 +31,10 @@ module.exports = [
                 {
         test: /\.svg$/,
         loader: 'svg-inline-loader'
-    },
+    },{
+       test   : /\.woff|\.woff2|\.svg|.eot|\.ttf/,
+       loader : 'url?prefix=font/&limit=10000'
+},
           {
             test: /(\.js|\.jsx)$/,
             exclude: /(node_modules|bower_components)/,

@@ -3,6 +3,7 @@ import ReactNodeGraph from './graph/'
 import MenuBar from './new_node'
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import toposort from 'toposort'
+import 'react-notifications/lib/notifications.css';
 
 const FunctionNode = function(nid,params={callable,fields,module,x,y}){
         //unique id for node
@@ -26,7 +27,6 @@ const FunctionNode = function(nid,params={callable,fields,module,x,y}){
                 {'name':'observed','value':'None'}],
             out:[{'name':'return'}]
         }
-
         this.data = {'freq':[],'bins':[]}
     this.color = params.color ? params.color : 'black'
 };
@@ -116,13 +116,13 @@ const LiteralNode = function(nid,fields,x,y){
     //unique id for node
     this.nid = nid;
     this.type = "Data"
-    //position on graph
+    // position on graph
     this.x = x ? x :200;
     this.y = y ? y : 200;
     //literal nodes do not have editable names
     this.name = this.nid;
     this.fields = fields ? fields : {
-        input:[{'name':'literal','value':'None'}],
+        input:[],
         out:[{'name':'value'}]
     }
     this.color = "#032b33"
@@ -147,7 +147,8 @@ export default class App extends Component {
         // comm allowing communication with jupyter kernel
         // send message with this.comm.send()
         this.comm = props.props.comm;
-        // callback function used when message recieved from kernel
+        this.node_types = props.props.node_types
+        // callback function used when message received from kernel
         this.comm._msg_callback = this.msg_handler.bind(this);
     }
 
@@ -177,8 +178,8 @@ export default class App extends Component {
             this.comm.send({type:'CodeCompile',body:{graph:this.state.graph,'order':order}})
             this.createNotification('graph compiling...')        }
         catch(err) {
-            this.createNotification('Error in graph compile')
-            this.createNotification(err)
+            this.createNotification('Error in graph compile');
+            this.createNotification(err);
             console.log("cycles found")
         }
         }
@@ -188,6 +189,13 @@ export default class App extends Component {
         graph.nodes[node].data = data;
         this.setState({graph: graph});
     }
+
+    updateInputValue(e,data){
+        let graph = this.state.graph;
+        graph.nodes[node].data = data;
+        this.setState({graph: graph});
+    }
+
     storeConnection(connection){
         let fromNode = connection.from_node;
         let fromPin = connection.from;
@@ -199,6 +207,7 @@ export default class App extends Component {
         let connections = [...graph.connections,connection];
         let toPinIdx = this.computePinIndexfromLabel(graph.nodes[toNode].fields.input,toPin)
         graph.nodes[toNode].fields.input[toPinIdx].value = graph.nodes[fromNode].name;
+        graph.nodes[toNode].fields.input[toPinIdx].connected = true;
         graph.connections = connections;
         this.setState({graph: graph});
     }
@@ -226,7 +235,8 @@ export default class App extends Component {
         console.log(connector);
         let to_node = graph.nodes[connector.to_node]
         let pinIdx = this.computePinIndexfromLabel(to_node.fields.input, connector.to)
-        to_node.fields.input[pinIdx].value = 'None'
+        to_node.fields.input[pinIdx].value = '';
+        to_node.fields.input[pinIdx].connected = false;
         graph.connections = connections;
         this.setState({graph: graph});
     }
@@ -249,6 +259,7 @@ export default class App extends Component {
 
     updateNodes(posteriors){
         this.createNotification('updating posteriors...')
+        console.log(posteriors)
         for(var node_name in posteriors){
             this.updateNodeData(node_name,posteriors[node_name])
         }
@@ -271,7 +282,9 @@ export default class App extends Component {
 
 
     createNewNode(event,node_type){
-        let node = new FunctionNode(this.node_count,new node_mapping[node_type])
+        // let node = new FunctionNode(this.node_count,new node_mapping[node_type])
+        console.log(this.node_types[node_type]['fields'])
+        let node = new FunctionNode(this.node_count,JSON.parse(JSON.stringify(this.node_types[node_type])))
         let graph = this.state.graph;
         graph.nodes[this.node_count] = node;
         this.node_count += 1;
@@ -289,10 +302,16 @@ export default class App extends Component {
 
     };
 
+    updateValue(nid,pinIndx,value){
+        let graph = this.state.graph;
+        graph.nodes[nid].fields.input[pinIndx].value = value
+        this.setState({'graph':graph})
+    }
+
     render() {
            return (
                <div>
-                   <MenuBar new_node={this.createNewNode.bind(this)} generate = {this.kernelGenerateCode.bind(this)} sample={this.kernelSample.bind(this)}/>
+                   <MenuBar node_types={this.node_types} new_node={this.createNewNode.bind(this)} generate = {this.kernelGenerateCode.bind(this)} sample={this.kernelSample.bind(this)}/>
             <ReactNodeGraph
                 data={this.state.graph}
                 onNodeMove={(nid, pos)=>this.onNodeMove(nid, pos)}
@@ -301,6 +320,7 @@ export default class App extends Component {
                 onRemoveConnector={(connector)=>this.onRemoveConnector(connector)}
                 onNodeSelect={(nid) => {this.handleNodeSelect(nid)}}
                 onNodeDeselect={(nid) => {this.handleNodeDeselect(nid)}}
+                updateValue={this.updateValue.bind(this)}
             />
 <NotificationContainer/>
                </div>
