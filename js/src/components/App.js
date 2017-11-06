@@ -31,85 +31,6 @@ const FunctionNode = function(nid,params={callable,fields,module,x,y}){
     this.color = params.color ? params.color : 'black'
 };
 
-const node_mapping = {
-    'normal': function () {
-        this.module = 'pymc3';
-        this.type = 'distribution';
-        this.callable = 'Normal';
-        this.fields = {input:[{'name': 'mu', 'value': 'None'}, {'name': 'sd', 'value': 'None'}, {
-            'name': 'observed',
-            'value': 'None'
-        }],
-        out:[{'name': 'return'}]}
-    },
-    'binomial': function () {
-        this.module = 'pymc3';
-        this.type = 'distribution';
-        this.callable = 'Binomial';
-        this.fields = {input:[{'name': 'n', 'value': 'None'}, {'name': 'p', 'value': 'None'}, {
-            'name': 'observed',
-            'value': 'None'
-        }],
-        out:[{'name': 'return'}]}
-    },
-    'uniform': function () {
-        this.module = 'pymc3';
-        this.type = 'distribution';
-        this.callable = 'Uniform';
-        this.fields = {input:[{'name': 'lower', 'value': 'None'}, {'name': 'upper', 'value': 'None'}, {
-            'name': 'observed',
-            'value': 'None'
-        }],
-        out:[{'name': 'return'}]}
-    },
-    'gamma': function () {
-        this.module = 'pymc3';
-        this.type = 'distribution';
-        this.callable = 'Uniform';
-        this.input = [{'name': 'alpha', 'value': 'None'}, {'name': 'beta', 'value': 'None'}, {
-            'name': 'observed',
-            'value': 'None'
-        }];
-        this.out = [{'name': 'return'}]
-    },
-    'product': function () {
-        this.module = '';
-        this.type = 'expression';
-        this.callable = '*';
-        this.alias = 'Product';
-        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
-        out:[{'name': 'return'}]};
-        this.color = "rgb(94, 159, 173)"
-    },
-    'sum': function () {
-        this.module = '';
-        this.type = 'expression';
-        this.callable = '+';
-        this.alias = 'Sum';
-        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
-        out:[{'name': 'return'}]};
-        this.color = "rgb(94, 159, 173)"
-    },
-    'subtract': function () {
-        this.module = '';
-        this.type = 'expression';
-        this.callable = '-';
-        this.alias = 'Subtract';
-        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
-        out:[{'name': 'return'}]};
-        this.color = "rgb(94, 159, 173)"
-    },
-    'quotient': function () {
-        this.module = '';
-        this.type = 'expression';
-        this.callable = '/';
-        this.alias = 'Quotient';
-        this.fields = {input:[{'name': 'a', 'value': 'None'}, {'name': 'b', 'value': 'None'}],
-        out:[{'name': 'return'}]};
-        this.color = "rgb(94, 159, 173)"
-    },
-}
-
 
 const LiteralNode = function(nid,fields,x,y){
     //Literal nodes have no inputs and must be defined at initialisation
@@ -316,7 +237,10 @@ export default class App extends Component {
     render() {
            return (
                <div>
-                   <TemporaryDrawer node_types={this.node_types} new_node={this.createNewNode.bind(this)} generate = {this.kernelGenerateCode.bind(this)} sample={this.kernelSample.bind(this)}/>
+                   <TemporaryDrawer node_types={this.node_types}
+                                    new_node={this.createNewNode.bind(this)}
+                                    generate = {this.kernelGenerateCode.bind(this)}
+                                    sample={this.kernelSample.bind(this)}/>
             <ReactNodeGraph
                 data={this.state.graph}
                 onNodeMove={(nid, pos)=>this.onNodeMove(nid, pos)}

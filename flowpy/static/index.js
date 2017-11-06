@@ -22327,85 +22327,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.color = params.color ? params.color : 'black';
 	};
 
-	var node_mapping = {
-	    'normal': function normal() {
-	        this.module = 'pymc3';
-	        this.type = 'distribution';
-	        this.callable = 'Normal';
-	        this.fields = { input: [{ 'name': 'mu', 'value': 'None' }, { 'name': 'sd', 'value': 'None' }, {
-	                'name': 'observed',
-	                'value': 'None'
-	            }],
-	            out: [{ 'name': 'return' }] };
-	    },
-	    'binomial': function binomial() {
-	        this.module = 'pymc3';
-	        this.type = 'distribution';
-	        this.callable = 'Binomial';
-	        this.fields = { input: [{ 'name': 'n', 'value': 'None' }, { 'name': 'p', 'value': 'None' }, {
-	                'name': 'observed',
-	                'value': 'None'
-	            }],
-	            out: [{ 'name': 'return' }] };
-	    },
-	    'uniform': function uniform() {
-	        this.module = 'pymc3';
-	        this.type = 'distribution';
-	        this.callable = 'Uniform';
-	        this.fields = { input: [{ 'name': 'lower', 'value': 'None' }, { 'name': 'upper', 'value': 'None' }, {
-	                'name': 'observed',
-	                'value': 'None'
-	            }],
-	            out: [{ 'name': 'return' }] };
-	    },
-	    'gamma': function gamma() {
-	        this.module = 'pymc3';
-	        this.type = 'distribution';
-	        this.callable = 'Uniform';
-	        this.input = [{ 'name': 'alpha', 'value': 'None' }, { 'name': 'beta', 'value': 'None' }, {
-	            'name': 'observed',
-	            'value': 'None'
-	        }];
-	        this.out = [{ 'name': 'return' }];
-	    },
-	    'product': function product() {
-	        this.module = '';
-	        this.type = 'expression';
-	        this.callable = '*';
-	        this.alias = 'Product';
-	        this.fields = { input: [{ 'name': 'a', 'value': 'None' }, { 'name': 'b', 'value': 'None' }],
-	            out: [{ 'name': 'return' }] };
-	        this.color = "rgb(94, 159, 173)";
-	    },
-	    'sum': function sum() {
-	        this.module = '';
-	        this.type = 'expression';
-	        this.callable = '+';
-	        this.alias = 'Sum';
-	        this.fields = { input: [{ 'name': 'a', 'value': 'None' }, { 'name': 'b', 'value': 'None' }],
-	            out: [{ 'name': 'return' }] };
-	        this.color = "rgb(94, 159, 173)";
-	    },
-	    'subtract': function subtract() {
-	        this.module = '';
-	        this.type = 'expression';
-	        this.callable = '-';
-	        this.alias = 'Subtract';
-	        this.fields = { input: [{ 'name': 'a', 'value': 'None' }, { 'name': 'b', 'value': 'None' }],
-	            out: [{ 'name': 'return' }] };
-	        this.color = "rgb(94, 159, 173)";
-	    },
-	    'quotient': function quotient() {
-	        this.module = '';
-	        this.type = 'expression';
-	        this.callable = '/';
-	        this.alias = 'Quotient';
-	        this.fields = { input: [{ 'name': 'a', 'value': 'None' }, { 'name': 'b', 'value': 'None' }],
-	            out: [{ 'name': 'return' }] };
-	        this.color = "rgb(94, 159, 173)";
-	    }
-	};
-
 	var LiteralNode = function LiteralNode(nid, fields, x, y) {
 	    //Literal nodes have no inputs and must be defined at initialisation
 	    //unique id for node
@@ -22666,7 +22587,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                _react2.default.createElement(_new_node2.default, { node_types: this.node_types, new_node: this.createNewNode.bind(this), generate: this.kernelGenerateCode.bind(this), sample: this.kernelSample.bind(this) }),
+	                _react2.default.createElement(_new_node2.default, { node_types: this.node_types,
+	                    new_node: this.createNewNode.bind(this),
+	                    generate: this.kernelGenerateCode.bind(this),
+	                    sample: this.kernelSample.bind(this) }),
 	                _react2.default.createElement(_graph2.default, {
 	                    data: this.state.graph,
 	                    onNodeMove: function onNodeMove(nid, pos) {
@@ -23722,8 +23646,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'updateValue',
 	        value: function updateValue(index, data) {
-	            alert("!");
-	            console.log(index, data);
 	            this.props.updateValue(index, data);
 	        }
 	    }, {
@@ -85750,8 +85672,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -85762,92 +85682,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Created by phil on 9/23/17.
 	 */
 
-
-	var SwitchListSecondary = function (_React$Component) {
-	  _inherits(SwitchListSecondary, _React$Component);
-
-	  function SwitchListSecondary() {
-	    var _ref;
-
-	    var _temp, _this, _ret;
-
-	    _classCallCheck(this, SwitchListSecondary);
-
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-
-	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = SwitchListSecondary.__proto__ || Object.getPrototypeOf(SwitchListSecondary)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-	      checked: ['wifi']
-	    }, _this.handleToggle = function (value) {
-	      return function () {
-	        var checked = _this.state.checked;
-
-	        var currentIndex = checked.indexOf(value);
-	        var newChecked = [].concat(_toConsumableArray(checked));
-
-	        if (currentIndex === -1) {
-	          newChecked.push(value);
-	        } else {
-	          newChecked.splice(currentIndex, 1);
-	        }
-
-	        _this.setState({
-	          checked: newChecked
-	        });
-	      };
-	    }, _temp), _possibleConstructorReturn(_this, _ret);
-	  }
-
-	  _createClass(SwitchListSecondary, [{
-	    key: 'render',
-	    value: function render() {
-	      var classes = this.props.classes;
-
-
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        _react2.default.createElement(
-	          _List2.default,
-	          { subheader: _react2.default.createElement(
-	              _List.ListSubheader,
-	              null,
-	              'Settings'
-	            ) },
-	          _react2.default.createElement(
-	            _List.ListItem,
-	            null,
-	            _react2.default.createElement(_List.ListItemText, { primary: 'Wi-Fi' }),
-	            _react2.default.createElement(
-	              _List.ListItemSecondaryAction,
-	              null,
-	              _react2.default.createElement(_Switch2.default, {
-	                onClick: this.handleToggle('wifi'),
-	                checked: this.state.checked.indexOf('wifi') !== -1
-	              })
-	            )
-	          ),
-	          _react2.default.createElement(
-	            _List.ListItem,
-	            null,
-	            _react2.default.createElement(_List.ListItemText, { primary: 'Bluetooth' }),
-	            _react2.default.createElement(
-	              _List.ListItemSecondaryAction,
-	              null,
-	              _react2.default.createElement(_Switch2.default, {
-	                onClick: this.handleToggle('bluetooth'),
-	                checked: this.state.checked.indexOf('bluetooth') !== -1
-	              })
-	            )
-	          )
-	        )
-	      );
-	    }
-	  }]);
-
-	  return SwitchListSecondary;
-	}(_react2.default.Component);
 
 	var styles = function styles(theme) {
 	  return {
@@ -85874,16 +85708,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
-	var DistributionIcon = function (_React$Component2) {
-	  _inherits(DistributionIcon, _React$Component2);
+	var DistributionIcon = function (_React$Component) {
+	  _inherits(DistributionIcon, _React$Component);
 
 	  function DistributionIcon(props) {
 	    _classCallCheck(this, DistributionIcon);
 
-	    var _this2 = _possibleConstructorReturn(this, (DistributionIcon.__proto__ || Object.getPrototypeOf(DistributionIcon)).call(this, props));
+	    var _this = _possibleConstructorReturn(this, (DistributionIcon.__proto__ || Object.getPrototypeOf(DistributionIcon)).call(this, props));
 
-	    _this2.icon_type = props.icon_type;
-	    return _this2;
+	    _this.icon_type = props.icon_type;
+	    return _this;
 	  }
 
 	  _createClass(DistributionIcon, [{
@@ -85903,29 +85737,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return DistributionIcon;
 	}(_react2.default.Component);
 
-	var TemporaryDrawer = function (_React$Component3) {
-	  _inherits(TemporaryDrawer, _React$Component3);
+	var TemporaryDrawer = function (_React$Component2) {
+	  _inherits(TemporaryDrawer, _React$Component2);
 
 	  function TemporaryDrawer(props) {
 	    _classCallCheck(this, TemporaryDrawer);
 
-	    var _this3 = _possibleConstructorReturn(this, (TemporaryDrawer.__proto__ || Object.getPrototypeOf(TemporaryDrawer)).call(this, props));
+	    var _this2 = _possibleConstructorReturn(this, (TemporaryDrawer.__proto__ || Object.getPrototypeOf(TemporaryDrawer)).call(this, props));
 
-	    _this3.state = {
+	    _this2.state = {
 	      left: false
 	    };
 
-	    _this3.toggleDrawer = function (side, open) {
+	    _this2.toggleDrawer = function (side, open) {
 	      return function () {
-	        _this3.setState({
+	        _this2.setState({
 	          left: open
 	        });
 	      };
 	    };
 
-	    _this3.new_node = props.new_node;
-	    _this3.node_types = props.node_types;
-	    return _this3;
+	    _this2.new_node = props.new_node;
+	    _this2.node_types = props.node_types;
+	    return _this2;
 	  }
 
 	  _createClass(TemporaryDrawer, [{
@@ -85936,7 +85770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this3 = this;
 
 	      var classes = this.props.classes;
 
@@ -85956,14 +85790,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _react2.default.createElement(
 	          _List.ListItem,
 	          { key: key, button: true, onClick: function onClick() {
-	              return _this4.newNode(key);
+	              return _this3.newNode(key);
 	            } },
 	          _react2.default.createElement(
 	            _Avatar2.default,
 	            null,
-	            _react2.default.createElement(DistributionIcon, { key: key, icon_type: _this4.node_types[key].module })
+	            _react2.default.createElement(DistributionIcon, { key: key, icon_type: _this3.node_types[key].module })
 	          ),
-	          _react2.default.createElement(_List.ListItemText, { primary: key, secondary: _this4.node_types[key].module })
+	          _react2.default.createElement(_List.ListItemText, { primary: key, secondary: _this3.node_types[key].module })
 	        );
 	      });
 
@@ -86006,24 +85840,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _react2.default.createElement(
 	              _Card2.default,
 	              { className: classes.card },
-	              _react2.default.createElement(
-	                _Card.CardContent,
-	                null,
-	                _react2.default.createElement(SwitchListSecondary, null)
-	              ),
-	              _react2.default.createElement(
-	                _Card.CardActions,
-	                null,
-	                _react2.default.createElement(
-	                  _Button2.default,
-	                  { dense: true },
-	                  'Learn More'
-	                )
-	              )
+	              _react2.default.createElement(_Card.CardContent, null)
 	            ),
 	            _react2.default.createElement(
 	              'div',
-	              { style: { maxHeight: '500px', overflow: 'scroll' } },
+	              { style: { maxHeight: '700px', overflow: 'scroll' } },
 	              _react2.default.createElement(
 	                _List2.default,
 	                null,

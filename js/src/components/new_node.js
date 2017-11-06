@@ -22,57 +22,6 @@ import List, { ListItem, ListItemText,ListItemSecondaryAction,ListSubheader,  Li
 import Switch from 'material-ui/Switch'
 import Typography from 'material-ui/Typography';
 
-class SwitchListSecondary extends React.Component {
-  state = {
-    checked: ['wifi'],
-  };
-
-  handleToggle = value => () => {
-    const { checked } = this.state;
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    this.setState({
-      checked: newChecked,
-    });
-  };
-
-  render() {
-    const { classes } = this.props;
-
-    return (
-      <div>
-        <List subheader={<ListSubheader>Settings</ListSubheader>}>
-          <ListItem>
-            <ListItemText primary="Wi-Fi" />
-            <ListItemSecondaryAction>
-              <Switch
-                onClick={this.handleToggle('wifi')}
-                checked={this.state.checked.indexOf('wifi') !== -1}
-              />
-            </ListItemSecondaryAction>
-          </ListItem>
-          <ListItem>
-
-            <ListItemText primary="Bluetooth" />
-            <ListItemSecondaryAction>
-              <Switch
-                onClick={this.handleToggle('bluetooth')}
-                checked={this.state.checked.indexOf('bluetooth') !== -1}
-              />
-            </ListItemSecondaryAction>
-          </ListItem>
-        </List>
-      </div>
-    );
-  }
-}
 const styles = theme => ({
   card: {
     minWidth: 275,
@@ -188,14 +137,9 @@ class TemporaryDrawer extends React.Component {
 
               </div>
               <Card className={classes.card}>
-        <CardContent>
-<SwitchListSecondary/>
-        </CardContent>
-        <CardActions>
-          <Button dense>Learn More</Button>
-        </CardActions>
+        <CardContent/>
       </Card>
-              <div style={{maxHeight:'500px',overflow:'scroll'}}>
+              <div style={{maxHeight:'700px',overflow:'scroll'}}>
               <List >
             {sideList}
               </List>
