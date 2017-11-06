@@ -3,7 +3,7 @@ import json
 import pymc3.distributions as dists
 from collections import namedtuple, OrderedDict
 from inspect import Parameter
-
+import theano
 field = namedtuple('field',['name','default'])
 
 
@@ -69,14 +69,38 @@ class DistributionNode(Node):
         super(DistributionNode, self).__init__(cls,type="distribution")
         self.add_field('observed')
 
-node_types = {}
+
+class ExpressionNode(Node):
+    def __init__(self,expression,type=None,color='green',node=None,*args,**kwargs):
+        self.type = 'expression'
+        self.name = expression
+        self.module = 'theano.tensor'
+        self.args = OrderedDict()
+        self.fields = self._args_to_fields()
+        self.add_field('a')
+        self.add_field('b')
+        self.color = color
+
+    def str_args(self):
+        return self.node['callable'].join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != 'None'])
+
+
+node_types = OrderedDict()
+
+for key,item in dists.__dict__.items():
+    if inspect.isclass(item) and issubclass(item, dists.Distribution):
+        node_types[key] = DistributionNode(item)
 
 for key,item in dists.__dict__.items():
     if inspect.isclass(item) and issubclass(item, dists.Distribution):
         node_types[key] = DistributionNode(item)
 
 
-node_types_json = {key:item.to_json() for key, item in node_types.items()}
 
-def b(a,b):
-    pass
+
+node_types_json = OrderedDict({key:item.to_json() for key, item in node_types.items()})
+
+for key,exp in {'add':'add','subtract':'sub','divide':'div',
+                'multiply':'mul','power':'pow','modulo':'mod',
+                'exponential':'exp','log':'log','square root':'sqrt'}.items():
+    node_types_json.update({key:ExpressionNode(exp).to_json()})

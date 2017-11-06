@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactNodeGraph from './graph/'
-import MenuBar from './new_node'
+import TemporaryDrawer from './new_node'
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import toposort from 'toposort'
 import 'react-notifications/lib/notifications.css';
@@ -176,11 +176,9 @@ export default class App extends Component {
         try {
             let order = toposort(this.connectionsAsArray());
             this.comm.send({type:'CodeCompile',body:{graph:this.state.graph,'order':order}})
-            this.createNotification('graph compiling...')        }
+            this.createNotification('graph compiling...','info')        }
         catch(err) {
-            this.createNotification('Error in graph compile');
-            this.createNotification(err);
-            console.log("cycles found")
+            this.createNotification('Error in graph compile. Cycles found.','error');
         }
         }
 
@@ -268,9 +266,9 @@ export default class App extends Component {
     // Handle messages from the kernel
     msg_handler(message){
         let msg = message.content.data;
-        if(msg.type == "ERROR"){this.createNotification(msg.body)}
-        if(msg.type == "POSTERIOR"){this.updateNodes(msg.body)}
-        if(msg.type == "LOAD_GRAPH"){this.load_graph(msg.body)}
+        if(msg.type == "ERROR"){this.createNotification(msg.body,'error')}
+        if(msg.type == "POSTERIOR"){this.updateNodes(msg.body,'info')}
+        if(msg.type == "LOAD_GRAPH"){this.load_graph(msg.body,'info')}
     }
 
     load_graph(graph){
@@ -281,7 +279,7 @@ export default class App extends Component {
     };
 
 
-    createNewNode(event,node_type){
+    createNewNode(node_type){
         // let node = new FunctionNode(this.node_count,new node_mapping[node_type])
         console.log(this.node_types[node_type]['fields'])
         let node = new FunctionNode(this.node_count,JSON.parse(JSON.stringify(this.node_types[node_type])))
@@ -296,8 +294,15 @@ export default class App extends Component {
         this.comm.send({type:'Sample',body:{graph:this.state.graph}})
     }
 
-    createNotification(msg){
-          NotificationManager.info(msg);
+    createNotification(msg,type){
+        switch(type){
+            case 'info':
+                NotificationManager.info(msg);
+                break;
+            case 'error':
+                NotificationManager.error(msg);
+        }
+
 
 
     };
@@ -311,7 +316,7 @@ export default class App extends Component {
     render() {
            return (
                <div>
-                   <MenuBar node_types={this.node_types} new_node={this.createNewNode.bind(this)} generate = {this.kernelGenerateCode.bind(this)} sample={this.kernelSample.bind(this)}/>
+                   <TemporaryDrawer node_types={this.node_types} new_node={this.createNewNode.bind(this)} generate = {this.kernelGenerateCode.bind(this)} sample={this.kernelSample.bind(this)}/>
             <ReactNodeGraph
                 data={this.state.graph}
                 onNodeMove={(nid, pos)=>this.onNodeMove(nid, pos)}

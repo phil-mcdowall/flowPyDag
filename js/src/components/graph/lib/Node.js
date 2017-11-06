@@ -5,14 +5,11 @@ import NodeOuputList from './NodeOutputList';
 import TextField from 'material-ui/TextField';
 import { Sparklines,SparklinesBars,SparklinesLine,SparklinesReferenceLine } from 'react-sparklines';
 var Draggable = require('react-draggable');
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 
-const muiTheme = getMuiTheme({
 
-});
 
 class AxisLabels extends React.Component {
     constructor(props) {
@@ -126,7 +123,6 @@ class Node extends React.Component {
         >
         <section className={nodeClass} style={{zIndex:10000}}>
             <header className="node-header" style={{backgroundColor:this.props.color}}>
-              <MuiThemeProvider muiTheme={muiTheme}>
               <span className="node-title">
 {this.props.title} :
                 <TextField
@@ -139,7 +135,6 @@ class Node extends React.Component {
     />
 
                    </span>
-              </MuiThemeProvider>
             </header>
             <div className="node-content">
               <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} updateValue={this.updateValue.bind(this)}/>

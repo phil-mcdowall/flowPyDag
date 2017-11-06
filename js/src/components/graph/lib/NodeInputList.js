@@ -11,7 +11,8 @@ export default class NodeInputList extends React.Component {
             }
 
             	updateValue(index,data){
-                	console.log()
+                    alert("!")
+                	console.log(index,data)
                 	this.props.updateValue(index,data);
 				}
 

@@ -1,18 +1,16 @@
 import React from 'react';
 import TextField from 'material-ui/TextField';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import Tooltip from 'material-ui/internal/Tooltip';
-
+import Tooltip from 'material-ui/Tooltip';
+import Input from 'material-ui/Input';
 class ShortenWTooltip extends React.Component {
     constructor(props) {
         super(props);
         this.content = props.content;
     }
     render(){
-		if(this.content.length >= 7){return 								<MuiThemeProvider muiTheme={muiTheme}>
-				<span>{this.content.slice(0,5) + '..'}			</span>
-		</MuiThemeProvider>
+		if(this.content.length >= 7){return(
+				<Tooltip title={this.content}><span>{this.content.slice(0,5) + '..'}			</span></Tooltip>
+		)
 		}
     	else{return <span>{this.content}</span>}
 	}
@@ -34,20 +32,18 @@ class ValueInput extends React.Component {
 	render(){
 	if(!this.props.props.item.connected){
 		return(
-								<MuiThemeProvider muiTheme={muiTheme}>
 									<span>
 										{' =  '}
-					<TextField
-      id="text-field-default"
+					<Input
+        placeholder="..."
+        inputProps={{
+          'aria-label': 'Description',
+        }}
+		style={{color:'white',width:'30%'}}
       onFocus={this.disable_keybindings}
-	  hintText={'...'}
 						onChange={this.props.updateValue}
-						hintStyle={{color:'lightgrey',bottom:'0px'}}
-            style={{width:'20%',height:'100%',color:'white','font-size':'inherit'}}
-            underlineStyle={{display: 'none'}}
-      inputStyle={{height:'100%',color:'white','font-size':'inherit'}}
+
 					/></span>
-					</MuiThemeProvider>
 		)
 	}
 	else{
@@ -56,9 +52,7 @@ class ValueInput extends React.Component {
 	}
 }
 
-const muiTheme = getMuiTheme({
 
-});
 export default class NodeInputListItem extends React.Component {
 	constructor(props) {
 		super(props);
@@ -88,8 +82,8 @@ export default class NodeInputListItem extends React.Component {
   		e.preventDefault();
 	}
 
-	UpdateValue(e,data){
-	this.props.updateValue(this.props.index,data)
+	UpdateValue(e){
+	this.props.updateValue(this.props.index,e.target.value)
 }
 
 	render() {

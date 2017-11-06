@@ -13,7 +13,7 @@ class Dag(Component):
 
         # Code is executed in evalscope dictionary
         self.evalscope = {}
-        exec("import pymc3", self.evalscope)
+        exec("import pymc3;import theano", self.evalscope)
 
         self.code = None
 
@@ -41,6 +41,8 @@ class Dag(Component):
     def parse_graph_message(self, graph):
         self.graph = graph['graph']
         self.graph_nodes =[graph['graph']['nodes'][str(node_id)] for node_id in graph['order']]
+        for node in self.graph_nodes:
+            print('node type: {}'.format(node['type']))
         self.nodes = [self.node_mapping.get(node['type'],NullNode)(node) for node in self.graph_nodes]
 
     def compile_graph(self):
@@ -50,8 +52,7 @@ class Dag(Component):
         try:
             exec(self.code, self.evalscope)
         except Exception as e:
-            self.send_error_message(self.code)
-            print(self.code)
+            self.send_error_message(e)
             raise
 
     def _handle_msg(self, msg):
@@ -83,18 +84,19 @@ class Dag(Component):
         msg_body = {}
 
         for node in self.nodes:
-            node_id, node_name = node.node.get('nid'), node.name
+            node_id, node_name, node_type = node.node.get('nid'), node.name, node.node.get('type')
             print("id:{} name:{}".format(node_id,node_name))
-            try:
-                samples = self.evalscope['samples'][node_name]
-                histogram = np.histogram(samples, bins=50)
-                msg_body[node_id] = {'freq':list(histogram[0]),
-                                     'min':np.min(histogram[1]),
-                                     'max':np.max(histogram[1]),
-                                     'mean':np.mean(samples),
-                                     'median':np.median(samples)}
-            except KeyError as e:
-                print(e)
+            if node_type == 'distribution':
+                try:
+                    samples = self.evalscope['samples'][node_name]
+                    histogram = np.histogram(samples, bins=30)
+                    msg_body[node_id] = {'freq':list(histogram[0]),
+                                         'min':np.min(histogram[1]),
+                                         'max':np.max(histogram[1]),
+                                         'mean':np.mean(samples),
+                                         'median':np.median(samples)}
+                except KeyError as e:
+                    print(e)
         return msg_body
 
     def send_load_graph_message(self,graph):
@@ -168,10 +170,10 @@ class Node:
 class ExpressionNode(Node):
     def __init__(self,node):
         super(ExpressionNode,self).__init__(node)
-        self.return_template = "    {name} = {args} \n"
+        self.return_template = "    {name} = {module}.{callable}({args})\n"
 
     def str_args(self):
-        return self.node['callable'].join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != 'None'])
+        return ','.join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
 
 
 class DistributionNode(Node):
