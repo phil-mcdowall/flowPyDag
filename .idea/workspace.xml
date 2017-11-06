@@ -50,7 +50,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="new_node.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="new_node.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/src/components/new_node.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="360">
@@ -62,12 +62,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="961">
-                <caret line="64" column="22" lean-forward="false" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
+              <first_editor relative-caret-position="331">
+                <caret line="35" column="3" lean-forward="false" selection-start-line="35" selection-start-column="3" selection-end-line="35" selection-end-column="3" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -235,10 +235,10 @@
         <option value="$PROJECT_DIR$/js/package.json" />
         <option value="$PROJECT_DIR$/flowpy/node_generator.py" />
         <option value="$PROJECT_DIR$/flowpy/dag.py" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/js/src/components/App.js" />
         <option value="$PROJECT_DIR$/js/src/components/graph/lib/NodeInputList.js" />
         <option value="$PROJECT_DIR$/js/src/components/new_node.js" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -1250,17 +1250,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="961">
-            <caret line="64" column="22" lean-forward="false" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/src/components/graph/lib/NodeInputListItem.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
@@ -1316,6 +1305,17 @@
           <folding>
             <element signature="e#41#67#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="331">
+            <caret line="35" column="3" lean-forward="false" selection-start-line="35" selection-start-column="3" selection-end-line="35" selection-end-column="3" />
+            <folding />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
