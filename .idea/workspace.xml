@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7dfd59fa-b8de-460e-aa29-1a82aa9b6535" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/docs/dag_screenshot_v0_0_1.png" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/defined_messages.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/linear_regression.graph" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/flowpy-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/flowpy-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/flowpy.ipynb" afterPath="$PROJECT_DIR$/flowpy.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/flowpy/static/index.js" afterPath="$PROJECT_DIR$/flowpy/static/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/src/components/App.js" afterPath="$PROJECT_DIR$/js/src/components/App.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/src/components/graph/lib/NodeInputList.js" afterPath="$PROJECT_DIR$/js/src/components/graph/lib/NodeInputList.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/src/components/new_node.js" afterPath="$PROJECT_DIR$/js/src/components/new_node.js" />
-    </list>
+    <list default="true" id="7dfd59fa-b8de-460e-aa29-1a82aa9b6535" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
