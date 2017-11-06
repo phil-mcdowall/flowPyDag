@@ -32,8 +32,9 @@ dag = Dag(data={'predictor_1':x,'predictor_2':y,'data':z})
 
 # display dag editor in notebook
 display(dag)
-
-# load example linear regression graph
+```
+```
+# load example  graph
 dag.load_graph('eight_schools.graph')
 ```
 Model data must currently be specified when the dag is created (see #TODO). Nodes are added using the
