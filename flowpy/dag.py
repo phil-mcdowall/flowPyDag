@@ -3,7 +3,7 @@ import random
 import numpy as np
 from collections import OrderedDict
 import json
-from .node_generator import node_types_json
+from .node_generator import node_types_json, ExpressionNode, DistributionNode, Node
 
 class Dag(Component):
     module = 'Dag'
@@ -42,8 +42,8 @@ class Dag(Component):
         self.graph = graph['graph']
         self.graph_nodes =[graph['graph']['nodes'][str(node_id)] for node_id in graph['order']]
         for node in self.graph_nodes:
-            print('node type: {}'.format(node['type']))
-        self.nodes = [self.node_mapping.get(node['type'],NullNode)(node) for node in self.graph_nodes]
+            print('node: {}'.format(node))
+        self.nodes = [self.node_mapping.get(node['type'], NullNode)(node=node) for node in self.graph_nodes]
 
     def compile_graph(self):
         self.code = self.code_generator.generate_code(self.nodes)
@@ -136,58 +136,62 @@ class CodeGenerator:
         return context_manager + code + inference
 
 
-class Node:
-    def __init__(self,node):
-        print(node)
-        self.node = node
-        self.args = self.dict_args()
-        self.set_name(node)
-        self.args_str = self.str_args()
-        self.check_args_for_required()
-        self.return_template = "    {name} = {callable}('{name}',{args})\n"
-
-    def set_name(self,node):
-        self.name = node['nid']
-
-    def check_args_for_required(self):
-        for arg in self.node['fields']['input']:
-            if arg['value'] == '__required__':
-                raise ValueError("Required argument {} missing in node {}".format(arg['name'],self.node['name']))
-
-    def dict_args(self):
-        args = {}
-        for arg in self.node['fields']['input']:
-            args[arg['name']] = arg['value']
-        return args
-
-    def str_args(self):
-        return ','.join(["{name} = {value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
-
-    def __str__(self):
-        return self.return_template.format(args=self.args_str, **self.node)
-
-
-class ExpressionNode(Node):
-    def __init__(self,node):
-        super(ExpressionNode,self).__init__(node)
-        self.return_template = "    {name} = {module}.{callable}({args})\n"
-
-    def str_args(self):
-        return ','.join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
+# class Node:
+#     def __init__(self,node):
+#         print(node)
+#         self.node = node
+#         self.args = self.dict_args()
+#         self.set_name(node)
+#         self.args_str = self.str_args()
+#         self.check_args_for_required()
+#         self.return_template = "    {name} = {callable}('{name}',{args})\n"
+#
+#     def set_name(self,node):
+#         self.name = node['nid']
+#
+#     def check_args_for_required(self):
+#         for arg in self.node['fields']['input']:
+#             if arg['value'] == '__required__':
+#                 raise ValueError("Required argument {} missing in node {}".format(arg['name'],self.node['name']))
+#
+#     def dict_args(self):
+#         args = {}
+#         for arg in self.node['fields']['input']:
+#             args[arg['name']] = arg['value']
+#         return args
+#
+#     def str_args(self):
+#         return ','.join(["{name} = {value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
+#
+#     def __str__(self):
+#         return self.return_template.format(args=self.args_str, **self.node)
 
 
-class DistributionNode(Node):
-    def __init__(self, node):
-        super(DistributionNode, self).__init__(node)
-        self.return_template = "    {name} = pymc3.{callable}({args})\n"
+# class ExpressionNode(Node):
+#     def __init__(self,node):
+#         super(ExpressionNode,self).__init__(node)
+#         self.return_template = "    {name} = {module}.{callable}({args})\n"
+#
+#     def str_args(self):
+#         return ','.join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
+#
+#
+# class DistributionNode(Node):
+#     def __init__(self, node):
+#         super(DistributionNode, self).__init__(node)
+#         self.return_template = "    {name} = pymc3.{callable}({args})\n"
+#
+#     def set_name(self,node):
+#         self.name = self.args['name'].strip("'")
 
-    def set_name(self,node):
-        self.name = self.args['name'].strip("'")
-
-class DataNode(Node):
+class DataNode:
+    def __init__(self,*kwargs):
+        pass
     def __str__(self):
         return ''
 
-class NullNode(Node):
+class NullNode:
+    def __init__(self,**kwargs):
+        pass
     def __str__(self):
         return ''
