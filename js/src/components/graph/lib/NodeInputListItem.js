@@ -39,7 +39,7 @@ class ValueInput extends React.Component {
         inputProps={{
           'aria-label': 'Description',
         }}
-		style={{color:'white',width:'30%'}}
+		style={{color:'white',width:'30%','padding':'0px'}}
       onFocus={this.disable_keybindings}
 						onChange={this.props.updateValue}
 

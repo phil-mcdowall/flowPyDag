@@ -135,7 +135,9 @@ body {
     text-align: right;
 }
 
-
+.MuiInput-input-67{
+    padding: 0 !important;
+}
 .nodeInputList, .nodeOutputList {
     list-style: none;
     padding: 0;
