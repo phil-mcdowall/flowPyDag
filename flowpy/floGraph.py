@@ -3,7 +3,7 @@ import random
 import numpy as np
 from collections import OrderedDict
 import json
-from .node_generator import PyMC3Nodes
+from .node_mapping import PyMC3Nodes
 from .floNodes import TheanoOpNode, DistributionNode, DataNode, NullNode, Node
 
 class Dag(Component):
