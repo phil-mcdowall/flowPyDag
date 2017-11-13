@@ -3,3 +3,4 @@ js/node_modules
 flowpy.egg-info/
 **/*.pyc
 .idea/
+scratch/
