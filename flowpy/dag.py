@@ -1,18 +1,17 @@
 from jupyter_react import Component
-import random
 import numpy as np
-from collections import OrderedDict
 import json
-from .node_generator import PyMC3Nodes
+from .node_mapping import pymc3Nodes, node_mapping
 from .floNodes import TheanoOpNode, DistributionNode, DataNode, NullNode, Node
 
 class Dag(Component):
     module = 'Dag'
 
-    def __init__(self,data=None, **kwargs):
+    def __init__(self, data=None, **kwargs):
         self.code_generator = CodeGenerator()
         self.code_generator.context_manager = PyMC3ContextManager()
         self.code_generator.postfix = PyMC3QuickInference()
+        self.node_mapping = node_mapping
 
         # Code is executed in evalscope dictionary
         self.evalscope = {}
@@ -24,12 +23,7 @@ class Dag(Component):
         self.graph_nodes = None
         self.nodes = {}
 
-        props = {'node_types': PyMC3Nodes}
-
-        self.node_mapping = {'expression': TheanoOpNode,
-                             'distribution': DistributionNode,
-                             'function': Node,
-                             'data': DataNode}
+        props = {'node_types': pymc3Nodes()}
 
         if data is not None:
             if type(data) is not dict:
@@ -157,7 +151,7 @@ class PyMC3ContextManager:
 class PyMC3QuickInference:
     # TODO inference as node
     def __str__(self):
-        n_samples = 1000
+        n_samples = 10000
         inference = "\n    approx = pymc3.fit(n=30000, method=pymc3.ADVI(), model=model)" \
                     "\n    samples = approx.sample({nsamples})".format(nsamples=n_samples)
         return inference

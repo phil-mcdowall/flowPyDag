@@ -135,7 +135,7 @@ body {
     text-align: right;
 }
 
-.MuiInput-input-67{
+[class*='MuiInput-input-']{
     padding: 0 !important;
 }
 .nodeInputList, .nodeOutputList {

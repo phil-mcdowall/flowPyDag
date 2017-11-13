@@ -1,2 +1,6 @@
 js/node_modules
+.ipynb_checkpoints/
+flowpy.egg-info/
 **/*.pyc
+.idea/
+scratch/

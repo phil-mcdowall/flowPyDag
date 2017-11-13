@@ -230,8 +230,8 @@ class TheanoOpNode(Node):
     Adds two inputs, 'a' and 'b', for binary ops.
     Default color: green
     """
-    def __init__(self, expression=None, color='green', node=None, *args, **kwargs):
-        super(TheanoOpNode,self).__init__(wraps=expression,node=node,color='#344e30')
+    def __init__(self, wraps=None, color='#344e30', node=None, *args, **kwargs):
+        super(TheanoOpNode,self).__init__(wraps=wraps, node=node, color=color)
 
     def parse_wrapped(self, expression):
             self.type = 'expression'
@@ -241,7 +241,6 @@ class TheanoOpNode(Node):
             self.fields = NodeFields(self.args)
             self.add_field('a')
             self.add_field('b')
-            # self.color = color
 
     def str_args(self):
         return ','.join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
