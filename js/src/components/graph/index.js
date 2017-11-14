@@ -109,12 +109,12 @@ export default class index extends React.Component {
   }
 
   updateValue(nid,pinIndx,value){
-	  console.log('Field value updating level2')
-		console.log(nid);
-		console.log(pinIndx);
-		console.log(value);
 		this.props.updateValue(nid,pinIndx,value)
   }
+
+  deleteNode(node){
+  this.props.deleteNode(node)
+}
 
 	computePinIndexfromLabel(pins, pinLabel) {
 		let reval = 0;
@@ -185,7 +185,7 @@ export default class index extends React.Component {
     								
     								onStartConnector={(nid, outputIndex)=>this.handleStartConnector(nid, outputIndex)}
     								onCompleteConnector={(nid, inputIndex)=>this.handleCompleteConnector(nid, inputIndex)}
-
+									deleteNode={this.deleteNode.bind(this)}
 									updateValue={this.updateValue.bind(this)}
 										onNodeSelect={(nid) => {this.handleNodeSelect(nid)}}
 										onNodeDeselect={(nid) => {this.handleNodeDeselect(nid)}}

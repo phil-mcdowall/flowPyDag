@@ -22545,10 +22545,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }, {
+	        key: 'deleteNode',
+	        value: function deleteNode(node) {
+	            var graph = this.state.graph;
+	            delete graph.nodes[node];
+	            graph.connections.filter(function (x) {
+	                x.toNode = !node;
+	            });
+	            this.setState({ graph: graph });
+	        }
+	    }, {
 	        key: 'createNewNode',
 	        value: function createNewNode(node_type) {
-	            // let node = new FunctionNode(this.node_count,new node_mapping[node_type])
-	            console.log(this.node_types[node_type]['fields']);
 	            var node = new FunctionNode(this.node_count, JSON.parse(JSON.stringify(this.node_types[node_type])));
 	            var graph = this.state.graph;
 	            graph.nodes[this.node_count] = node;
@@ -22605,6 +22613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    onRemoveConnector: function onRemoveConnector(connector) {
 	                        return _this2.onRemoveConnector(connector);
 	                    },
+	                    onRemoveNode: this.deleteNode.bind(this),
 	                    onNodeSelect: function onNodeSelect(nid) {
 	                        _this2.handleNodeSelect(nid);
 	                    },
@@ -22804,11 +22813,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		}, {
 			key: 'updateValue',
 			value: function updateValue(nid, pinIndx, value) {
-				console.log('Field value updating level2');
-				console.log(nid);
-				console.log(pinIndx);
-				console.log(value);
 				this.props.updateValue(nid, pinIndx, value);
+			}
+		}, {
+			key: 'deleteNode',
+			value: function deleteNode(node) {
+				this.props.deleteNode(node);
 			}
 		}, {
 			key: 'computePinIndexfromLabel',
@@ -22938,7 +22948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 							onCompleteConnector: function onCompleteConnector(nid, inputIndex) {
 								return _this2.handleCompleteConnector(nid, inputIndex);
 							},
-
+							deleteNode: _this2.deleteNode.bind(_this2),
 							updateValue: _this2.updateValue.bind(_this2),
 							onNodeSelect: function onNodeSelect(nid) {
 								_this2.handleNodeSelect(nid);

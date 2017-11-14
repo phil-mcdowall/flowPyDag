@@ -199,10 +199,14 @@ export default class App extends Component {
         for(let node in graph.nodes){this.node_count += 1}
     };
 
+    deleteNode(node){
+        let graph = this.state.graph;
+        delete graph.nodes[node];
+        graph.connections.filter(function(x){x.toNode =! node});
+        this.setState({graph: graph});
+    }
 
     createNewNode(node_type){
-        // let node = new FunctionNode(this.node_count,new node_mapping[node_type])
-        console.log(this.node_types[node_type]['fields'])
         let node = new FunctionNode(this.node_count,JSON.parse(JSON.stringify(this.node_types[node_type])))
         let graph = this.state.graph;
         graph.nodes[this.node_count] = node;
@@ -247,6 +251,7 @@ export default class App extends Component {
                 onNodeStartMove={(nid)=>this.onNodeStartMove(nid)}
                 onNewConnector={(n1,o,n2,i)=>this.onNewConnector(n1,o,n2,i)}
                 onRemoveConnector={(connector)=>this.onRemoveConnector(connector)}
+                onRemoveNode={this.deleteNode.bind(this)}
                 onNodeSelect={(nid) => {this.handleNodeSelect(nid)}}
                 onNodeDeselect={(nid) => {this.handleNodeDeselect(nid)}}
                 updateValue={this.updateValue.bind(this)}

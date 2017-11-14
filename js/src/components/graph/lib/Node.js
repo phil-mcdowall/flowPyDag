@@ -85,6 +85,8 @@ class Node extends React.Component {
       this.props.updateValue(this.props.nid,index,data)
   }
 
+
+
   onChangeName(nid){
 
   }
