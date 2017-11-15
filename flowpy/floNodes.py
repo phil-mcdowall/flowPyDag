@@ -19,9 +19,7 @@ class NodeFields(MutableMapping):
     def __init__(self, node_args,bound=False, *args, **kwargs):
         self.bound = bound
         if bound:
-            print("NODE ARGS BOUND: ",node_args)
             self._storage = node_args
-            print(self._storage)
             self.check_args_for_required()
             return
         self._storage = {'out': [{'name': 'return'}], 'input': []}
@@ -92,8 +90,11 @@ class Node:
         or with a node instance returned from the flowpy front end. To initialise a new node type, specify 'wraps' and
         'nodetype'. To initialise a node with values from the front end, specify 'node'.
 
+        __init__ establishes empty instance attributes and then calls either parse_wrapped or parse_node depending on
+        whether the instance is being sent or received from the front end.
+
         Args:
-            :param wraps: (obj, optional): A python classs or function to be serialised and sent to front end as a node.
+            :param wraps: (obj, optional): A python class or function to be serialised and sent to front end as a node.
             :param nodetype: (str, optional): An additional node descriptor used to sort nodes returned from the frontend.
             :param color: (str, optional): The color of the node type in the front end. Named colors or rgb string.
             :param args: (optional)
@@ -106,7 +107,7 @@ class Node:
             name (str): Name of wrapped object.
             module (str): Module from which wrapped object is derived.
             args (dict): Dictionary of arguments from a wrapped python callable object.
-            fields (dict): Dict containing 'input' and 'out' keys, which contain list of node arguments.
+            fields (dict): Dict containing 'input' and 'out' pins for frontend node.
             varname (str): Name for variable in which the return value of the node is stored when executed.
             bound (bool): Is the node instance bound to a frontend node instance.
             boundargs (dict): Dict of arguments and values from frontend.
@@ -127,14 +128,22 @@ class Node:
 
         if wraps is None:
             node = kwargs.get('node', None)
-            if node is None:
-                raise ValueError("Either 'wraps' or 'node' dict required")
-            else:
+            if node is not None:
                 self.parse_node(node)
+            else:
+                raise ValueError("Either 'wraps' or 'node' dict required")
         else:
             self.parse_wrapped(wraps)
 
     def parse_wrapped(self, cls):
+        """
+        Initialises a node which wraps a class or function.
+        Tries to extract all relevant information from the object which
+        it wraps, but some object do not provide the relevant info and
+        parse_wrapped may need to be overridden in a subclass.
+        :param cls:
+        :return:
+        """
         self.name = cls.__name__
         self.module = cls.__module__
         if self.module in ['builtins', '__main__']:
@@ -145,10 +154,17 @@ class Node:
         except ValueError:
             pass
         if 'self' in args:
-           del args['self']
+            del args['self']
         self.fields = NodeFields(args)
 
-    def parse_node(self,node):
+    def parse_node(self, node):
+        """
+        Initialises a node using information passed from frontend.
+        The NodeFields class checks that all required arguments have values
+        and raises a ValueError if any are missing.
+        :param node:
+        :return:
+        """
         self.bound = True
         self.node = node
         self.type = node['type']
@@ -167,7 +183,7 @@ class Node:
         """
         Returns dictionary suitable for serialization to json to be sent to frontend.
         :param omit: (list: str, optional): List of inputs to be stripped from fields.
-        :param kwargs: additional fields to be sent to frontend
+        :param kwargs: additional attributes to be sent to frontend.
         :return: (dict): {'type':(str),
                           'module':(str),
                           'callable':(str),
@@ -190,12 +206,11 @@ class Node:
         """
         if not self.bound:
             return ''
-        print(self.fields.bound_args.items())
         return ','.join(["{name} = {value}".format(name=name, value=value) for name, value in self.fields.bound_args.items() if value != ''])
 
     def __str__(self):
         """
-        Returns a string representation of the node with bound arguments that can be evaluated via 'exec'
+        Returns a string representation of the node (with bound arguments) that can be evaluated via 'exec'
         :return: (str): executable string
         """
         return_template = "{varname} = {callable}({args})\n"
@@ -234,7 +249,7 @@ class TheanoOpNode(Node):
         super(TheanoOpNode,self).__init__(wraps=wraps, node=node, color=color)
 
     def parse_wrapped(self, expression):
-            self.type = 'expression'
+            self.type = 'theano_op'
             self.name = expression
             self.module = 'theano.tensor'
             self.args = OrderedDict()
@@ -243,6 +258,10 @@ class TheanoOpNode(Node):
             self.add_field('b')
 
     def str_args(self):
+        """
+        All theano ops args are positional only.
+        :return:
+        """
         return ','.join(["{value}".format(**x) for x in self.node['fields']['input'] if x['value'] != ''])
 
 

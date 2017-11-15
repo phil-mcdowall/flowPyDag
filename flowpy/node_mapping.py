@@ -77,7 +77,7 @@ theanoNodes = SerializeNodeMapping(TheanoOpNode).from_dict(_theanoOps)
 pymc3Nodes.update(theanoNodes)
 
 # maps node descriptions back to node types
-node_mapping = {'expression': TheanoOpNode,
+node_mapping = {'theano_op': TheanoOpNode,
                 'distribution': DistributionNode,
                 'function': Node,
                 'data': DataNode}
